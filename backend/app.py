@@ -1,4 +1,4 @@
-import sys, os, webbrowser, threading
+import sys, os, webbrowser, threading, time
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -25,6 +25,23 @@ async def get_options():
     }
 
 
+# ── Heartbeat / auto-shutdown (desktop mode) ──────────────
+import time as _time
+_app_state = {"last_hb": _time.time(), "shutdown": False}
+
+
+@app.post("/api/heartbeat")
+async def _heartbeat():
+    _app_state["last_hb"] = _time.time()
+    return {"ok": True}
+
+
+@app.post("/api/shutdown")
+async def _shutdown():
+    _app_state["shutdown"] = True
+    return {"ok": True}
+
+
 # ── Static file serving for packaged app ──────────────────
 if getattr(sys, 'frozen', False):
     _ROOT = Path(sys._MEIPASS)
@@ -35,9 +52,8 @@ if _FRONTEND_DIST.exists():
     app.mount("/", StaticFiles(directory=str(_FRONTEND_DIST), html=True), name="static")
 
 
-# ── Auto-open browser (suppressed in dev mode) ────────────
+# ── Auto-open browser in desktop mode ─────────────────────
 def _open_browser():
-    import time
     time.sleep(1)
     webbrowser.open("http://127.0.0.1:8000")
 

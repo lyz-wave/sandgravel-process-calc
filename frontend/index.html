@@ -8,5 +8,15 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Heartbeat: keep server alive while page is open
+      const HB = () => fetch('/api/heartbeat', { method: 'POST' }).catch(() => {});
+      setInterval(HB, 10000);
+      HB();
+      // Signal shutdown on page close
+      window.addEventListener('beforeunload', () => {
+        navigator.sendBeacon('/api/shutdown');
+      });
+    </script>
   </body>
 </html>
