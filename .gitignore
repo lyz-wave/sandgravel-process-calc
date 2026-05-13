@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Node
+node_modules/
+dist/
+
+# IDE
+.vscode/
+.idea/
+
+# Superpowers
+.superpowers/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp
+*.tmp
+test_export.xlsx
+cli_test.xlsx
+
+# Env
+.env

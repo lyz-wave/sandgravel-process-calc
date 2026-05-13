@@ -1,0 +1,39 @@
+system_throughput: 1500
+design_throughput: 1200
+feed_grading:
+  gt150: 69.0
+  _150_80: 12.0
+  _80_40: 7.0
+  _40_20: 7.0
+  _20_5: 3.0
+  lt5: 2.0
+jaw_crusher:
+  model: Ci125
+  css: 150
+  quantity: 3
+  unit_capacity: 500
+cone_crusher:
+  model: Ci225
+  css: 40
+  quantity: 3
+  unit_capacity: 420
+vsi_crusher:
+  model: PL9500
+  quantity: 6
+sand_recovery:
+  model: PL8500
+  quantity: 2
+screens:
+  pre_screening:
+    model: 2YKR3060
+    aperture: 80
+    quantity: 3
+  first_screening:
+    model: 3YKR2472
+    apertures: [40, 20, 5]
+    quantity: 4
+    wet: true
+  second_screening:
+    model: 2YKR2472
+    aperture: 5
+    quantity: 6
