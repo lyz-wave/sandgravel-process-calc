@@ -4,7 +4,11 @@ import os
 from pathlib import Path
 from .models import BalanceResult, MaterialStream, SizeDistribution, EquipmentSelection
 
-_CONFIG_DIR = Path(__file__).parent / "config"
+import sys as _sys
+if getattr(_sys, 'frozen', False):
+    _CONFIG_DIR = Path(_sys._MEIPASS) / "sandgravel_engine" / "config"
+else:
+    _CONFIG_DIR = Path(__file__).parent / "config"
 
 
 def load_yaml_config(option_name: str) -> dict:

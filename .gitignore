@@ -19,6 +19,11 @@ dist/
 .DS_Store
 Thumbs.db
 
+# PyInstaller
+build/
+dist/
+*.spec
+
 # Temp
 *.tmp
 test_export.xlsx
@@ -26,3 +31,4 @@ cli_test.xlsx
 
 # Env
 .env
+insert/
