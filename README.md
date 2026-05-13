@@ -2,6 +2,10 @@
 
 基于 Excel 黄金数据验证的砂石骨料加工系统工艺设计工具。支持工艺流程设计、物料平衡计算、设备选型、Excel 导入导出、交互式流程图可视化。
 
+## 下载
+
+**[SandGravelCalc.exe](https://github.com/lyz-wave/sandgravel-process-calc/releases/latest)** (31MB) — 单文件桌面应用，双击即用，无需安装任何依赖。
+
 ## 快速开始
 
 ```bash
@@ -99,6 +103,18 @@ python -m pytest tests/ -v
 ├── tests/                # 58 tests
 └── docs/                 # 设计文档
 ```
+
+## Excel 导入模板
+
+`insert/导入模板.xlsx` 包含 3 个 Sheet：
+
+| Sheet | 必填 | 内容 |
+|-------|:---:|------|
+| 物料平衡 | ✅ | 名称 / 吨位(t/h) / >150 / 150-80 / 80-40 / 40-20 / 20-5 / <5 |
+| 设备选型 | — | 型号 / 台数 / 单机能力(t/h) / 实际通过量(t/h) / 负荷率 |
+| 收敛信息 | — | 迭代次数 / 收敛误差 |
+
+Web 界面点击「导入 Excel」上传，或 CLI：`python -m sandgravel_engine --config your_config.yaml`
 
 ## 源文件依据
 
