@@ -6,6 +6,15 @@
 
 **[SandGravelCalc.exe](https://github.com/lyz-wave/sandgravel-process-calc/releases/latest)** (31MB) — 单文件桌面应用，双击即用，无需安装任何依赖。
 
+### 常见问题
+
+**双击无反应？** 按顺序排查：
+
+1. **Windows Defender 拦截** — 右键 exe → 属性 → 勾选「解除锁定」→ 确定。或双击时点击「更多信息」→「仍要运行」
+2. **端口被占用** — 之前的实例未关闭。打开任务管理器，结束所有 `SandGravelCalc.exe` 进程后重试
+3. **查看启动日志** — 桌面上的 `SandGravelCalc_startup.log` 记录了启动过程，崩溃时会弹窗显示具体错误
+4. **手动诊断** — Win+R → `cmd` → 把 exe 拖进命令行窗口 → 回车，可直接看到错误输出
+
 ## 快速开始
 
 ```bash
