@@ -37,9 +37,11 @@ cd frontend && npm run dev
 | 筛分设备选型（BEDVHTKPWSM 11因子） | ✅ | ✅ |
 | YAML 配置文件 | ✅ | ✅ |
 | Excel 导出/导入 | ✅ | ✅ |
-| 交互式 SVG 流程图 | — | ✅ |
+| PDF 计算报告 / 选型报告 | — | ✅ |
+| 交互式 SVG 流程图（两方案自适应） | — | ✅ |
 | 方案对比（Option1 vs Option2） | — | ✅ |
-| 参数面板实时计算 | — | ✅ |
+| 参数面板方案联动 | — | ✅ |
+| Industrial Control Room 暗色主题 | — | ✅ |
 
 ## 架构
 
@@ -87,6 +89,15 @@ python -m pytest tests/ -v
 
 覆盖全部计算模块，关键数据与 Excel 原始值误差 < 0.02%。
 
+## PDF 报告
+
+Web 界面点击「计算报告 PDF」或「选型报告 PDF」按钮导出暗色主题工程报告，包含：
+
+- 物料平衡表（中文物料流名称 × 6 粒级）
+- 设备选型表（型号/台数/负荷率，超负荷红色标注）
+- 收敛信息（迭代次数/误差）
+- SimHei 中文字体内嵌，跨平台兼容
+
 ## 项目结构
 
 ```
@@ -103,12 +114,15 @@ python -m pytest tests/ -v
 │   └── config/           # option1.yaml, option2.yaml
 ├── backend/              # FastAPI
 │   ├── app.py
+│   ├── pdf_export.py     # PDF 报告生成（暗色工业风）
 │   └── api/              # balance, equipment, screening, io
 ├── frontend/             # React + Vite
+│   ├── index.html        # Heartbeat 心跳 + shutdown 生命周期
 │   └── src/
+│       ├── index.css     # Industrial Control Room 全局样式
 │       ├── pages/        # CalculatePage, ComparePage
-│       ├── components/   # FlowDiagram, ParameterPanel, etc.
-│       └── api/          # client.ts
+│       ├── components/   # FlowDiagram (动态), ParameterPanel (方案联动), etc.
+│       └── api/          # client.ts (含 PDF 导出)
 ├── tests/                # 58 tests
 └── docs/                 # 设计文档
 ```
@@ -135,6 +149,6 @@ Web 界面点击「导入 Excel」上传，或 CLI：`python -m sandgravel_engin
 
 ## 依赖
 
-**Python:** `pip install fastapi uvicorn pyyaml openpyxl pandas`
+**Python:** `pip install fastapi uvicorn pyyaml openpyxl pandas reportlab pymupdf`
 
 **Node:** `cd frontend && npm install`

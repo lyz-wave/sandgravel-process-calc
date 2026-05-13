@@ -1,9 +1,27 @@
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter, UploadFile, File, Query
 from fastapi.responses import FileResponse
 import tempfile
 import os
 
 router = APIRouter()
+
+
+def _build_balance_result(data: dict):
+    from sandgravel_engine.models import BalanceResult, MaterialStream, SizeDistribution, EquipmentSelection
+
+    streams = {}
+    for name, s in data.get("streams", {}).items():
+        streams[name] = MaterialStream(
+            name=name, tonnage=s.get("tonnage", 0),
+            grading=SizeDistribution.from_list(s.get("grading", [0]*6)))
+
+    equipment = [EquipmentSelection(model=e["model"], quantity=e["quantity"],
+                  unit_capacity=e["unit_capacity"], actual_throughput=e.get("actual_throughput", 0))
+                 for e in data.get("equipment", [])]
+
+    return BalanceResult(streams=streams, equipment=equipment,
+                         iterations=data.get("iterations", 0),
+                         convergence_error=data.get("convergence_error", 0))
 
 
 @router.post("/io/import-excel")
@@ -25,23 +43,29 @@ async def import_excel(file: UploadFile = File(...)):
 @router.post("/io/export-excel")
 async def export_excel(data: dict):
     from sandgravel_engine.io import export_to_excel
-    from sandgravel_engine.models import BalanceResult, MaterialStream, SizeDistribution, EquipmentSelection
 
-    streams = {}
-    for name, s in data.get("streams", {}).items():
-        streams[name] = MaterialStream(
-            name=name, tonnage=s.get("tonnage", 0),
-            grading=SizeDistribution.from_list(s.get("grading", [0]*6)))
-
-    equipment = [EquipmentSelection(model=e["model"], quantity=e["quantity"],
-                  unit_capacity=e["unit_capacity"], actual_throughput=e.get("actual_throughput", 0))
-                 for e in data.get("equipment", [])]
-
-    result = BalanceResult(streams=streams, equipment=equipment,
-                          iterations=data.get("iterations", 0),
-                          convergence_error=data.get("convergence_error", 0))
+    result = _build_balance_result(data)
 
     path = tempfile.mktemp(suffix=".xlsx")
     export_to_excel(result, path)
     return FileResponse(path, filename="balance_result.xlsx",
                         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
+
+@router.post("/io/export-pdf")
+async def export_pdf(data: dict, type: str = Query("full", description="full | calculation | equipment")):
+    from backend.pdf_export import export_calculation_pdf, export_equipment_pdf
+
+    result = _build_balance_result(data)
+    config_name = data.get("config_name", "")
+
+    path = tempfile.mktemp(suffix=".pdf")
+
+    if type == "equipment":
+        export_equipment_pdf(result, path, config_name)
+        filename = "equipment_report.pdf"
+    else:
+        export_calculation_pdf(result, path, config_name)
+        filename = "calculation_report.pdf" if type == "calculation" else "engineering_report.pdf"
+
+    return FileResponse(path, filename=filename, media_type="application/pdf")

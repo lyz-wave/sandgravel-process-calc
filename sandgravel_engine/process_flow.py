@@ -17,6 +17,81 @@ OPT2_PRODUCTS = {"40-80mm": 0.0, "40-20mm": 27.75, "20-5mm": 22.70, "<5mm": 49.5
 OPT1_RECIRC = {"gt40": 1.20, "20_5": 2.79}
 OPT2_RECIRC = {"20_5": 2.76}
 
+# ── Flow structures for SVG rendering ───────────────────
+OPT1_FLOW = {
+    "nodes": [
+        {"id": "feed",    "label": "原矿给料", "sublabel": "Raw Feed",       "x": 30,  "y": 60,  "w": 130, "h": 56, "type": "feed",    "streamKey": "raw_feed"},
+        {"id": "grizzly", "label": "棒条筛",   "sublabel": "Grizzly 150mm",   "x": 210, "y": 60,  "w": 130, "h": 56, "type": "screen"},
+        {"id": "jaw",     "label": "颚式破碎机", "sublabel": "Ci125 e=150",    "x": 400, "y": 40,  "w": 140, "h": 56, "type": "crusher", "streamKey": "jaw_product"},
+        {"id": "prescreen","label":"预筛分",    "sublabel": "2YKR3060 80mm",   "x": 400, "y": 170, "w": 140, "h": 56, "type": "screen",  "streamKey": "pre_screen_feed"},
+        {"id": "cone",     "label": "圆锥破碎机", "sublabel": "Ci225 e=40",    "x": 620, "y": 120, "w": 140, "h": 56, "type": "crusher", "streamKey": "cone_product"},
+        {"id": "screen1", "label": "第一筛分",   "sublabel": "3YKR2472 40/20/5", "x": 400, "y": 300, "w": 170, "h": 60, "type": "screen"},
+        {"id": "vsi",     "label": "立轴冲击破", "sublabel": "PL9500 制砂",     "x": 150, "y": 430, "w": 140, "h": 56, "type": "crusher", "streamKey": "vsi_product"},
+        {"id": "screen2", "label": "第二筛分",   "sublabel": "2YKR2472 5mm",    "x": 430, "y": 430, "w": 150, "h": 56, "type": "screen"},
+        {"id": "prod_40_80", "label": "40-80mm 粗骨料", "sublabel": "成品",   "x": 650, "y": 230, "w": 140, "h": 50, "type": "product"},
+        {"id": "prod_lt5",   "label": "<5mm 机制砂",    "sublabel": "成品",   "x": 650, "y": 410, "w": 140, "h": 50, "type": "product"},
+        {"id": "prod_waste", "label": "细砂回收",       "sublabel": "PL8500", "x": 650, "y": 500, "w": 140, "h": 50, "type": "product"},
+    ],
+    "edges": [
+        {"from": "feed", "to": "grizzly", "fromPort": "right", "toPort": "left"},
+        {"from": "grizzly", "to": "jaw", "label": ">150", "fromPort": "top", "toPort": "left"},
+        {"from": "jaw", "to": "prescreen", "fromPort": "bottom", "toPort": "top"},
+        {"from": "grizzly", "to": "prescreen", "label": "<150", "fromPort": "right", "toPort": "top"},
+        {"from": "prescreen", "to": "cone", "label": ">80", "fromPort": "right", "toPort": "left"},
+        {"from": "prescreen", "to": "prod_40_80", "label": "40-80", "fromPort": "bottom", "toPort": "left"},
+        {"from": "cone", "to": "prescreen", "label": "循环", "dashed": True, "fromPort": "bottom", "toPort": "top"},
+        {"from": "prescreen", "to": "screen1", "label": "<40", "fromPort": "bottom", "toPort": "top"},
+        {"from": "screen1", "to": "vsi", "label": "40-20/20-5", "fromPort": "left", "toPort": "top"},
+        {"from": "vsi", "to": "screen2", "fromPort": "right", "toPort": "left"},
+        {"from": "screen2", "to": "vsi", "label": ">5 循环", "dashed": True, "fromPort": "top", "toPort": "bottom"},
+        {"from": "screen2", "to": "prod_lt5", "label": "<5", "fromPort": "right", "toPort": "left"},
+        {"from": "screen1", "to": "prod_waste", "label": "<5溢流", "fromPort": "right", "toPort": "left"},
+    ],
+    "streamMap": {
+        "feed":      ["raw_feed"],
+        "jaw":       ["jaw_product", "jaw_feed"],
+        "prescreen": ["pre_screen_feed"],
+        "cone":      ["cone_product"],
+        "vsi":       ["vsi_product"],
+    },
+    "productMap": {
+        "prod_40_80": "40-80mm",
+        "prod_lt5":   "<5mm",
+        "prod_waste": "细砂回收",
+    },
+}
+
+OPT2_FLOW = {
+    "nodes": [
+        {"id": "feed",      "label": "原矿给料",   "sublabel": "天然砂石料",     "x": 30,  "y": 100, "w": 130, "h": 56, "type": "feed",    "streamKey": "raw_feed"},
+        {"id": "prescreen", "label": "预筛分",     "sublabel": "3YKR2472 40/20/5", "x": 220, "y": 100, "w": 160, "h": 56, "type": "screen",  "streamKey": "pre_screen_feed"},
+        {"id": "vsi",       "label": "立轴冲击破",  "sublabel": "PL9500 制砂",     "x": 130, "y": 300, "w": 140, "h": 56, "type": "crusher", "streamKey": "vsi_product"},
+        {"id": "screen2",   "label": "第二筛分",   "sublabel": "2YKR2472 5mm",    "x": 380, "y": 300, "w": 150, "h": 56, "type": "screen"},
+        {"id": "prod_40_20","label": "40-20mm 粗骨料", "sublabel": "成品",    "x": 580, "y": 60,  "w": 140, "h": 50, "type": "product"},
+        {"id": "prod_20_5", "label": "20-5mm 粗骨料",  "sublabel": "成品",    "x": 580, "y": 160, "w": 140, "h": 50, "type": "product"},
+        {"id": "prod_lt5",  "label": "<5mm 机制砂",    "sublabel": "成品",    "x": 580, "y": 280, "w": 140, "h": 50, "type": "product"},
+    ],
+    "edges": [
+        {"from": "feed", "to": "prescreen", "fromPort": "right", "toPort": "left"},
+        {"from": "prescreen", "to": "prod_40_20", "label": "40-20", "fromPort": "top", "toPort": "left"},
+        {"from": "prescreen", "to": "prod_20_5", "label": "20-5", "fromPort": "right", "toPort": "left"},
+        {"from": "prescreen", "to": "vsi", "label": "20-5/<5", "fromPort": "bottom", "toPort": "top"},
+        {"from": "vsi", "to": "screen2", "fromPort": "right", "toPort": "left"},
+        {"from": "screen2", "to": "vsi", "label": ">5 循环", "dashed": True, "fromPort": "top", "toPort": "bottom"},
+        {"from": "screen2", "to": "prod_lt5", "label": "<5", "fromPort": "right", "toPort": "left"},
+    ],
+    "streamMap": {
+        "feed":      ["raw_feed"],
+        "prescreen": ["pre_screen_feed"],
+        "vsi":       ["vsi_product"],
+    },
+    "productMap": {
+        "prod_40_20": "40-20mm",
+        "prod_20_5":  "20-5mm",
+        "prod_lt5":   "<5mm",
+    },
+}
+
 
 @dataclass
 class FlowResult:
@@ -29,18 +104,24 @@ class FlowResult:
     error: float = 0.0
     system_throughput: float = 0.0
     option_name: str = ""
+    flow_structure: dict = field(default_factory=dict)
 
 
 def _build_result(T: float, grading: list[float], option: str,
-                  products: dict, recirc: dict) -> FlowResult:
-    """Build FlowResult with stream and equipment data."""
+                  products: dict, recirc: dict, config: dict = None) -> FlowResult:
+    """Build FlowResult with stream and equipment data.
+    Reads equipment models from YAML config when available.
+    """
+    flow_structure = OPT1_FLOW if option == "option1" else OPT2_FLOW
+
     R = FlowResult(system_throughput=T, option_name=option, products=products,
                    recirc_gt40=recirc.get("gt40", 0),
                    recirc_20_5=recirc.get("20_5", 0),
-                   error=round(100 - sum(products.values()), 4))
+                   error=round(100 - sum(products.values()), 4),
+                   flow_structure=flow_structure)
 
-    feel = MaterialStream.from_percent("raw_feed", T, grading)
-    R.streams["raw_feed"] = feel
+    feed = MaterialStream.from_percent("raw_feed", T, grading)
+    R.streams["raw_feed"] = feed
 
     jaw = JawCrusher(150)
     cone = ConeCrusher(40)

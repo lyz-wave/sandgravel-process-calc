@@ -52,6 +52,21 @@ async def calculate_balance(req: BalanceRequest):
             "recirculation_20_5": result.recirc_20_5,
             "iterations": result.iterations,
             "convergence_error": result.error,
+            "flow_structure": result.flow_structure,
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/balance/config-defaults")
+async def get_config_defaults(name: str = "option1"):
+    """Return default grading and throughput for a given config."""
+    from sandgravel_engine.io import load_yaml_config
+    config = load_yaml_config(name)
+    fg = config["feed_grading"]
+    grading = [fg.get(k, 0) for k in ("gt150", "_150_80", "_80_40", "_40_20", "_20_5", "lt5")]
+    return {
+        "config_name": name,
+        "system_throughput": config["system_throughput"],
+        "feed_grading": grading,
+    }
