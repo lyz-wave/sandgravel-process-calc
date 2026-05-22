@@ -14,6 +14,7 @@ dist/
 
 # Superpowers
 .superpowers/
+docs/superpowers/
 
 # OS
 .DS_Store
@@ -32,3 +33,8 @@ cli_test.xlsx
 # Env
 .env
 insert/
+
+# Session planning files (local only)
+findings.md
+progress.md
+task_plan.md
